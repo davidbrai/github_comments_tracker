@@ -25,12 +25,12 @@ github = oauth.remote_app(
 
 @app.route("/")
 def index():
-    if 'github_token' in session:
-        me = github.get('user')
-        return jsonify(me.data)
+    if not 'github_token' in session:
+        log.debug("redirecting to login")
+        return redirect(url_for('login'))
 
-    log.debug("redirecting to login")
-    return redirect(url_for('login'))
+    me = github.get('user')
+    return jsonify(me.data)
 
 @app.route('/login')
 def login():

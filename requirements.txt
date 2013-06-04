@@ -1,0 +1,6 @@
+Flask==0.9
+Jinja2==2.7
+MarkupSafe==0.18
+PyGithub==1.16.0
+Werkzeug==0.8.3
+wsgiref==0.1.2

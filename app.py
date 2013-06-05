@@ -36,6 +36,7 @@ def get_comments(repo):
             'body': c.body,
             'url': c.html_url,
             'user_id': c.user.id,
+            'user_login': c.user.login,
             'commit': c.commit_id,
             'line': c.line,
             'path': c.path

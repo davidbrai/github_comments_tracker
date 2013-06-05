@@ -1,3 +1,6 @@
-<ul ng-repeat="comment in comments">
-    <li>{{ comment.body }}</li>
-</ul>
+<div ng-repeat="thread in threads">
+    <div>{{ thread.path }} (line #{{ thread.line }})</div>
+    <ul ng-repeat="comment in thread.comments">
+        <li>{{ comment.body }}</li>
+    </ul>
+</div>

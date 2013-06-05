@@ -1,5 +1,5 @@
 
-var app = angular.module('comments', []).config(function($routeProvider) {
+var app = angular.module('comments', ['threads']).config(function($routeProvider) {
     $routeProvider.when('/', {
         controller:CommentsCtrl, templateUrl:'/static/js/templates/comments-view.html'
     }).otherwise({
@@ -7,6 +7,6 @@ var app = angular.module('comments', []).config(function($routeProvider) {
     });
 });
 
-function CommentsCtrl($scope) {
-    $scope.comments = [{body:'fu'}];
+function CommentsCtrl($scope, Thread) {
+    $scope.threads = Thread.query();
 }

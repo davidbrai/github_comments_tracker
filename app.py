@@ -1,3 +1,4 @@
+import json
 from flask import Flask, session, redirect, url_for, jsonify, request, render_template
 from flask_oauthlib.client import OAuth
 import dao
@@ -60,6 +61,10 @@ def index():
 @app.route("/comments")
 def comments():
     return render_template('comments.html')
+
+@app.route("/threads")
+def threads():
+    return json.dumps(dao.get_threads())
 
 @app.route('/login')
 def login():

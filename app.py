@@ -24,6 +24,16 @@ github = oauth.remote_app(
     authorize_url='https://github.com/login/oauth/authorize'
 )
 
+def get_comments(repo):
+    comments = repo.get_comments()
+    my_comments = []
+    user_id = github.get('user').data['id']
+    for i, c in enumerate(comments[:30]):
+        log.info("At comment %d" % i)
+        if c.user.id == user_id:
+            my_comments.append({'id': c.id, 'body': c.body, 'url': c.html_url})
+    return {'c': my_comments}
+
 @app.route("/")
 def index():
     if not 'github_token' in session:
@@ -33,13 +43,7 @@ def index():
     log.info("getting comments from github")
     github_client = Github(session['github_token'][0])
     repo = github_client.get_repo(app.config['REPO_TO_FETCH'])
-    comments_text = []
-    comments = repo.get_comments()
-    for i, comment in enumerate(comments[:20]):
-        log.info("at comment: %s" % i)
-        comments_text.append(comment.body)
-    log.info("got: %s", comments_text[:5])
-    return jsonify({'comments': comments_text})
+    return jsonify(get_comments(repo))
 
 @app.route('/login')
 def login():

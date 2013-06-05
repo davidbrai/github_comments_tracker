@@ -1,5 +1,6 @@
 from flask import Flask, session, redirect, url_for, jsonify, request
 from flask_oauthlib.client import OAuth
+import dao
 import logging
 logging.basicConfig(level=logging.INFO)
 
@@ -30,8 +31,18 @@ def get_comments(repo):
     user_id = github.get('user').data['id']
     for i, c in enumerate(comments[:30]):
         log.info("At comment %d" % i)
+        comment = {
+            'id': c.id,
+            'body': c.body,
+            'url': c.html_url,
+            'user_id': c.user.id,
+            'commit': c.commit_id,
+            'line': c.line,
+            'path': c.path
+        }
+        dao.save_to_thread(comment)
         if c.user.id == user_id:
-            my_comments.append({'id': c.id, 'body': c.body, 'url': c.html_url})
+            my_comments.append(comment)
     return {'c': my_comments}
 
 @app.route("/")

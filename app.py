@@ -1,4 +1,4 @@
-from flask import Flask, session, redirect, url_for, jsonify, request
+from flask import Flask, session, redirect, url_for, jsonify, request, render_template
 from flask_oauthlib.client import OAuth
 import dao
 import logging
@@ -56,6 +56,10 @@ def index():
     github_client = Github(session['github_token'][0])
     repo = github_client.get_repo(app.config['REPO_TO_FETCH'])
     return jsonify(get_comments(repo))
+
+@app.route("/comments")
+def comments():
+    return render_template('comments.html')
 
 @app.route('/login')
 def login():

@@ -21,12 +21,10 @@ def save_to_thread(comment):
 
 def update_thread_created_date(query, created_at):
     query = dict(query)
-    query = {'$or': [
-                     {'created_at': {'$gt': created_at}},
-                     {'created_at': None}
-                     ]}
+    query['$or'] = [{'created_at': {'$gt': created_at}},
+                    {'created_at': None}]
     get_db().threads.update(query, {'$set': {'created_at': created_at}})
-
+    
 def get_threads():
     threads = get_db().threads.find().sort([('created_at', -1)])
     res = []

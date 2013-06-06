@@ -28,11 +28,9 @@ github = oauth.remote_app(
     authorize_url='https://github.com/login/oauth/authorize'
 )
 
-def get_comments(repo):
+def fetch_comments_from_github(repo, max_comments=None):
     comments = repo.get_comments()
-    my_comments = []
-    user_id = github.get('user').data['id']
-    for i, c in enumerate(comments[:30]):
+    for i, c in enumerate(comments[:max_comments]):
         log.info("At comment %d" % i)
         comment = {
             'id': c.id,
@@ -46,16 +44,13 @@ def get_comments(repo):
             'created_at': c.created_at
         }
         dao.save_to_thread(comment)
-        if c.user.id == user_id:
-            my_comments.append(comment)
-    return {'c': my_comments}
 
 def datetime_json_handler(obj):
     if isinstance(obj, datetime.datetime):
         return obj.isoformat() 
 
-@app.route("/")
-def index():
+@app.route("/fetch_comments/<int:max_comments>")
+def login_to_github_and_get_all_comments(max_comments):
     if not 'github_token' in session:
         log.info("redirecting to login")
         return redirect(url_for('login'))
@@ -63,12 +58,13 @@ def index():
     log.info("getting comments from github")
     github_client = Github(session['github_token'][0])
     repo = github_client.get_repo(app.config['REPO_TO_FETCH'])
-    return jsonify(get_comments(repo))
+    fetch_comments_from_github(repo, max_comments)
+    return redirect(url_for('comments'))
 
 def jsonify(data):
     return Response(json.dumps(data, default=datetime_json_handler, indent=2), mimetype='application/json')
 
-@app.route("/comments")
+@app.route("/")
 def comments():
     return render_template('comments.html')
 

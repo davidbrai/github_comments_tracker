@@ -1,3 +1,9 @@
+<p>
+    Got {{ threads.length }} threads.<br>
+    <a href="/fetch_comments/100">fetch 100 comments from github</a><br>
+    <a href="/fetch_comments">fetch all comments from github (slow)</a>
+</p>
+
 <div ng-repeat="thread in threads">
     <div><a href="{{ thread.comments[0].url }}">{{ thread.path }} (line #{{ thread.line }})</a></div>
     <ul ng-repeat="comment in thread.comments">

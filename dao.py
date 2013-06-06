@@ -31,7 +31,6 @@ def get_threads():
     return res
 
 def get_comments(comment_ids):
-    print "got comment ids: %s" % comment_ids
     comments = list(get_db().comments.find({'id': {'$in': comment_ids}}))
     return remove_object_ids(comments)
 

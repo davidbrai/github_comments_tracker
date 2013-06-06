@@ -61,6 +61,10 @@ def login_to_github_and_get_all_comments(max_comments):
     fetch_comments_from_github(repo, max_comments)
     return redirect(url_for('comments'))
 
+@app.route("/fetch_comments")
+def fetch_comments():
+    return login_to_github_and_get_all_comments(max_comments=None)
+
 def jsonify(data):
     return Response(json.dumps(data, default=datetime_json_handler, indent=2), mimetype='application/json')
 

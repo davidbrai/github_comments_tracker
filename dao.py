@@ -2,7 +2,7 @@ import pymongo
 import settings
 
 def get_db():
-    return pymongo.Connection()[settings.MONGO_DB]
+    return pymongo.MongoClient()[settings.MONGO_DB]
 
 def save_to_thread(comment):
     comment_id = comment['id']

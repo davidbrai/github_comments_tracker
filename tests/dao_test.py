@@ -1,6 +1,7 @@
 import unittest
 import settings
 import dao
+import datetime
 
 class TestDao(unittest.TestCase):
 
@@ -18,8 +19,11 @@ class TestDao(unittest.TestCase):
         else:
             raise AssertionError("do you really want to drop database: %s?" % self.mongodb.name)
 
-    def _comment(self, id=123, commit='somecommitid', path='somepath', line='someline'):
-        return {'id': 123, 'commit': commit, 'path': path, 'line': line}
+    def _comment(self, id=123, commit='somecommitid', path='somepath', line='someline', created_at=None):
+        if not created_at:
+            created_at = datetime.datetime.today()
+        created_at = created_at.replace(microsecond=0)
+        return {'id': 123, 'commit': commit, 'path': path, 'line': line, 'created_at': created_at}
 
     def test_puts_comments_in_same_commit_path_line_in_same_thread(self):
         comment1 = self._comment(id=123)
@@ -52,4 +56,32 @@ class TestDao(unittest.TestCase):
         threads = dao.get_threads()
         self.assertEqual(len(threads[0]['comments']), 1)
 
-
+    def test_updates_created_date_on_thread(self):
+        comment = self._comment(created_at=datetime.datetime.now())
+        
+        dao.save_to_thread(comment)
+        
+        thread = dao.get_threads()[0]
+        self.assertEqual(thread['created_at'], comment['created_at'])
+    
+    def test_changes_created_date_if_comment_with_earlier_date(self):
+        now = datetime.datetime.now()
+        comment = self._comment(created_at=now)
+        dao.save_to_thread(comment)
+        
+        comment2 = self._comment(created_at=(now-datetime.timedelta(days=5)))
+        dao.save_to_thread(comment2)
+        
+        thread = dao.get_threads()[0]
+        self.assertEqual(thread['created_at'], comment2['created_at'])
+    
+    def test_doesnt_change_date_if_comment_with_later_date(self):
+        now = datetime.datetime.now()
+        comment = self._comment(created_at=now)
+        dao.save_to_thread(comment)
+        
+        comment2 = self._comment(created_at=(now+datetime.timedelta(days=5)))
+        dao.save_to_thread(comment2)
+        
+        thread = dao.get_threads()[0]
+        self.assertEqual(thread['created_at'], comment['created_at'])

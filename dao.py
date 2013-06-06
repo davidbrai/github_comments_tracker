@@ -16,7 +16,16 @@ def save_to_thread(comment):
             query,
             {'$push': {'comments': comment_id}},
             upsert=True)
+    
+    update_thread_created_date(query, comment['created_at'])
 
+def update_thread_created_date(query, created_at):
+    query = dict(query)
+    query = {'$or': [
+                     {'created_at': {'$gt': created_at}},
+                     {'created_at': None}
+                     ]}
+    get_db().threads.update(query, {'$set': {'created_at': created_at}})
 
 def get_threads():
     threads = get_db().threads.find()
@@ -26,6 +35,7 @@ def get_threads():
             'path': thread['path'],
             'line': thread['line'],
             'commit': thread['commit'],
+            'created_at': thread['created_at'],
             'comments': get_comments(thread['comments'])
         })
     return res

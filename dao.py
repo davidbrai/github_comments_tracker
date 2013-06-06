@@ -28,7 +28,7 @@ def update_thread_created_date(query, created_at):
     get_db().threads.update(query, {'$set': {'created_at': created_at}})
 
 def get_threads():
-    threads = get_db().threads.find()
+    threads = get_db().threads.find().sort([('created_at', -1)])
     res = []
     for thread in threads:
         res.append({

@@ -85,3 +85,14 @@ class TestDao(unittest.TestCase):
         
         thread = dao.get_threads()[0]
         self.assertEqual(thread['created_at'], comment['created_at'])
+    
+    def test_returns_thread_ordered_by_created_descending(self):
+        now = datetime.datetime.now()
+        later = now + datetime.timedelta(days=5)
+        comment1 = self._comment(id=123, line='someline', created_at=now)
+        dao.save_to_thread(comment1)
+        comment2 = self._comment(id=124, line='differentline', created_at=later)
+        dao.save_to_thread(comment2)
+        
+        threads = dao.get_threads()
+        self.assertEqual(threads[0]['line'], 'differentline')

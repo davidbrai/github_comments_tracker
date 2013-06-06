@@ -1,8 +1,10 @@
 import json
-from flask import Flask, session, redirect, url_for, jsonify, request, render_template
+from flask import Flask, session, redirect, url_for, request, render_template
 from flask_oauthlib.client import OAuth
 import dao
 import logging
+import datetime
+from flask.wrappers import Response
 logging.basicConfig(level=logging.INFO)
 
 from github import Github
@@ -40,12 +42,17 @@ def get_comments(repo):
             'user_login': c.user.login,
             'commit': c.commit_id,
             'line': c.line,
-            'path': c.path
+            'path': c.path,
+            'created_at': c.created_at
         }
         dao.save_to_thread(comment)
         if c.user.id == user_id:
             my_comments.append(comment)
     return {'c': my_comments}
+
+def datetime_json_handler(obj):
+    if isinstance(obj, datetime.datetime):
+        return obj.isoformat() 
 
 @app.route("/")
 def index():
@@ -58,13 +65,16 @@ def index():
     repo = github_client.get_repo(app.config['REPO_TO_FETCH'])
     return jsonify(get_comments(repo))
 
+def jsonify(data):
+    return Response(json.dumps(data, default=datetime_json_handler, indent=2), mimetype='application/json')
+
 @app.route("/comments")
 def comments():
     return render_template('comments.html')
 
 @app.route("/threads")
 def threads():
-    return json.dumps(dao.get_threads())
+    return jsonify(dao.get_threads())
 
 @app.route('/login')
 def login():

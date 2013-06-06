@@ -13,3 +13,8 @@ DEBUG = True
 
 SECRET_KEY = 'development key'
 ```
+
+Running tests:
+```
+nosetests tests/
+```

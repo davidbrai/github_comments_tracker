@@ -1,17 +1,18 @@
 import pymongo
 import settings
 
-mongodb = pymongo.Connection()[settings.MONGO_DB]
+def get_db():
+    return pymongo.Connection()[settings.MONGO_DB]
 
 def save_to_thread(comment):
-    mongodb.threads.update(
+    get_db().threads.update(
             {'commit': comment['commit'], 'line': comment['line'], 'path': comment['path']},
             {'$push': {'comments': comment}},
             upsert=True)
 
 
 def get_threads():
-    threads = mongodb.threads.find()
+    threads = get_db().threads.find()
     res = []
     for thread in threads:
         res.append({

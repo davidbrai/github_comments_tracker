@@ -5,8 +5,8 @@
 </p>
 
 <div ng-repeat="thread in threads">
-    <div><a href="{{ thread.comments[0].url }}">{{ thread.path }} (line #{{ thread.line }})</a> Created: {{ thread.created_at }}</div>
+    <div><a href="{{ thread.comments[0].url }}">{{ thread.path }} (line #{{ thread.line }})</a> Created: {{ thread.created_at | fromNow }}</div>
     <ul ng-repeat="comment in thread.comments">
-        <li><b>{{ comment.user_login }}</b>: {{ comment.body }} <i>{{ comment.created_at }}</i></li>
+        <li><b>{{ comment.user_login }}</b>: {{ comment.body }} <i>{{ comment.created_at | fromNow }}</i></li>
     </ul>
 </div>

@@ -17,25 +17,32 @@ def save_to_thread(comment):
             {
              '$push': {'comments': comment_id},
              '$setOnInsert': {'created_at': comment['created_at'],
+                              'created_by': comment['user_id'],
                               'updated_at': comment['created_at']}
              },
             upsert=True)
     
-    update_thread_created_date(query, comment['created_at'])
+    update_thread_created_fields(query, comment['created_at'], comment['user_id'])
     update_thread_updated_date(query, comment['created_at'])
 
-def update_thread_created_date(query, created_at):
+def update_thread_created_fields(query, created_at, created_by):
     update_query = query.copy()
     update_query['created_at'] = {'$gt': created_at}
-    get_db().threads.update(update_query, {'$set': {'created_at': created_at}})
+    get_db().threads.update(update_query, {'$set': {'created_at': created_at, 'created_by': created_by}})
 
 def update_thread_updated_date(query, created_at):
     update_query = query.copy()
     update_query['updated_at'] = {'$lt': created_at}
     get_db().threads.update(update_query, {'$set': {'updated_at': created_at}})
-    
-def get_threads():
-    threads = get_db().threads.find().sort([('updated_at', -1)])
+
+def get_user_threads(user_id):
+    return _get_threads({'created_by': user_id})
+
+def get_all_threads():
+    return _get_threads({})
+
+def _get_threads(query):
+    threads = get_db().threads.find(query).sort([('updated_at', -1)])
     res = []
     for thread in threads:
         res.append({

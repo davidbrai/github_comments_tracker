@@ -1,7 +1,8 @@
 angular.module('threads', ['ngResource']).
-        factory('Thread', function($resource)
+        factory('Threads', function($resource)
 {
-    var Thread = $resource('/threads', {}, {});
-
-    return Thread;
+    return {
+        all: $resource('/threads/all'),
+        mine: $resource('/threads')
+    };
 });

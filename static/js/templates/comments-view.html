@@ -1,7 +1,11 @@
 <p>
     Got {{ threads.length }} threads.<br>
     <a href="/fetch_comments/100">fetch 100 comments from github</a><br>
-    <a href="/fetch_comments">fetch all comments from github (slow)</a>
+    <a href="/fetch_comments">fetch all comments from github (slow)</a><br>
+    <div ng-switch on="mode" >
+        <a ng-switch-when="all" href="#">My threads</a>
+        <a ng-switch-when="mine" href="#/all">All threads</a>
+    </div>
 </p>
 
 <div ng-repeat="thread in threads">

@@ -1,7 +1,9 @@
 
 var app = angular.module('comments', ['threads']).config(function($routeProvider) {
     $routeProvider.when('/', {
-        controller:CommentsCtrl, templateUrl:'/static/js/templates/comments-view.html'
+        controller:MyThreadsCtrl, templateUrl:'/static/js/templates/comments-view.html'
+    }).when('/all', {
+        controller:AllThreadsCtrl, templateUrl:'/static/js/templates/comments-view.html'
     }).otherwise({
         redirectTo:'/'
     });
@@ -14,6 +16,12 @@ angular.module('comments').
         };
     });
 
-function CommentsCtrl($scope, Thread) {
-    $scope.threads = Thread.query();
+function AllThreadsCtrl($scope, Threads) {
+    $scope.mode = 'all';
+    $scope.threads = Threads.all.query();
+}
+
+function MyThreadsCtrl($scope, Threads) {
+    $scope.mode = 'mine';
+    $scope.threads = Threads.mine.query();
 }

@@ -51,7 +51,7 @@ def datetime_json_handler(obj):
 
 @app.route("/fetch_comments/<int:max_comments>")
 def login_to_github_and_get_all_comments(max_comments):
-    if not 'github_token' in session:
+    if not is_logged_in():
         log.info("redirecting to login")
         return redirect(url_for('login'))
 
@@ -70,11 +70,19 @@ def jsonify(data):
 
 @app.route("/")
 def comments():
+    if not is_logged_in():
+        log.info("redirecting to login")
+        return redirect(url_for('login'))
+
     return render_template('comments.html')
 
 @app.route("/threads")
-def threads():
-    return jsonify(dao.get_threads())
+def my_threads():
+    return jsonify(dao.get_user_threads(github.get('user').data['id']))
+
+@app.route("/threads/all")
+def all_threads():
+    return jsonify(dao.get_all_threads())
 
 @app.route('/login')
 def login():
@@ -83,7 +91,7 @@ def login():
 @app.route('/logout')
 def logout():
     session.pop('github_token', None)
-    return redirect(url_for('index'))
+    return redirect(url_for('comments'))
 
 @app.route('/login/authorized')
 @github.authorized_handler
@@ -96,11 +104,14 @@ def authorized(resp):
             request.args['error_description']
         )
     session['github_token'] = (resp['access_token'], '')
-    return redirect(url_for('index'))
+    return redirect(url_for('comments'))
 
 @github.tokengetter
 def get_github_oauth_token():
     return session.get('github_token')
+
+def is_logged_in():
+    return 'github_token' in session
 
 if __name__ == "__main__":
     app.run()

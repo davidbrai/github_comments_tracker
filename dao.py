@@ -14,15 +14,14 @@ def save_to_thread(comment):
     
     get_db().threads.update(
             query,
-            {'$push': {'comments': comment_id}},
+            {'$push': {'comments': comment_id},
+             '$setOnInsert': {'created_at': comment['created_at']}},
             upsert=True)
     
     update_thread_created_date(query, comment['created_at'])
 
 def update_thread_created_date(query, created_at):
-    query = dict(query)
-    query['$or'] = [{'created_at': {'$gt': created_at}},
-                    {'created_at': None}]
+    query['created_at'] = {'$gt': created_at}
     get_db().threads.update(query, {'$set': {'created_at': created_at}})
     
 def get_threads():

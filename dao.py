@@ -14,18 +14,28 @@ def save_to_thread(comment):
     
     get_db().threads.update(
             query,
-            {'$push': {'comments': comment_id},
-             '$setOnInsert': {'created_at': comment['created_at']}},
+            {
+             '$push': {'comments': comment_id},
+             '$setOnInsert': {'created_at': comment['created_at'],
+                              'updated_at': comment['created_at']}
+             },
             upsert=True)
     
     update_thread_created_date(query, comment['created_at'])
+    update_thread_updated_date(query, comment['created_at'])
 
 def update_thread_created_date(query, created_at):
-    query['created_at'] = {'$gt': created_at}
-    get_db().threads.update(query, {'$set': {'created_at': created_at}})
+    update_query = query.copy()
+    update_query['created_at'] = {'$gt': created_at}
+    get_db().threads.update(update_query, {'$set': {'created_at': created_at}})
+
+def update_thread_updated_date(query, created_at):
+    update_query = query.copy()
+    update_query['updated_at'] = {'$lt': created_at}
+    get_db().threads.update(update_query, {'$set': {'updated_at': created_at}})
     
 def get_threads():
-    threads = get_db().threads.find().sort([('created_at', -1)])
+    threads = get_db().threads.find().sort([('updated_at', -1)])
     res = []
     for thread in threads:
         res.append({
@@ -33,6 +43,7 @@ def get_threads():
             'line': thread['line'],
             'commit': thread['commit'],
             'created_at': thread['created_at'],
+            'updated_at': thread['updated_at'],
             'comments': get_comments(thread['comments'])
         })
     return res

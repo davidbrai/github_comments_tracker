@@ -64,6 +64,14 @@ class TestDao(unittest.TestCase):
         thread = dao.get_threads()[0]
         self.assertEqual(thread['created_at'], comment['created_at'])
     
+    def test_sets_updated_at_with_comment_date(self):
+        comment = self._comment(created_at=datetime.datetime.now())
+        
+        dao.save_to_thread(comment)
+        
+        thread = dao.get_threads()[0]
+        self.assertEqual(thread['updated_at'], comment['created_at'])
+    
     def test_changes_created_date_if_comment_with_earlier_date(self):
         now = datetime.datetime.now()
         comment = self._comment(created_at=now)
@@ -75,7 +83,18 @@ class TestDao(unittest.TestCase):
         thread = dao.get_threads()[0]
         self.assertEqual(thread['created_at'], comment2['created_at'])
     
-    def test_doesnt_change_date_if_comment_with_later_date(self):
+    def test_doesnt_change_updated_date_if_comment_with_later_date(self):
+        now = datetime.datetime.now()
+        comment = self._comment(created_at=now)
+        dao.save_to_thread(comment)
+        
+        comment2 = self._comment(created_at=(now-datetime.timedelta(days=5)))
+        dao.save_to_thread(comment2)
+
+        thread = dao.get_threads()[0]
+        self.assertEqual(thread['updated_at'], comment['created_at'])
+    
+    def test_doesnt_change_created_date_if_comment_with_later_date(self):
         now = datetime.datetime.now()
         comment = self._comment(created_at=now)
         dao.save_to_thread(comment)
@@ -85,6 +104,17 @@ class TestDao(unittest.TestCase):
         
         thread = dao.get_threads()[0]
         self.assertEqual(thread['created_at'], comment['created_at'])
+    
+    def test_changes_updated_date_if_comment_with_later_date(self):
+        now = datetime.datetime.now()
+        comment = self._comment(id=123, created_at=now)
+        dao.save_to_thread(comment)
+        
+        comment2 = self._comment(id=124, created_at=(now+datetime.timedelta(days=5)))
+        dao.save_to_thread(comment2)
+        
+        thread = dao.get_threads()[0]
+        self.assertEqual(thread['updated_at'], comment2['created_at'])
     
     def test_only_updates_date_of_relevant_thread(self):
         now = datetime.datetime.now()
@@ -98,7 +128,7 @@ class TestDao(unittest.TestCase):
         thread = [t for t in dao.get_threads() if t['line'] == 'line1'][0]
         self.assertEqual(thread['created_at'], comment1['created_at'])
     
-    def test_returns_thread_ordered_by_created_descending(self):
+    def test_returns_thread_ordered_by_updated_descending(self):
         now = datetime.datetime.now()
         later = now + datetime.timedelta(days=5)
         comment1 = self._comment(id=123, line='someline', created_at=now)
@@ -108,6 +138,20 @@ class TestDao(unittest.TestCase):
         
         threads = dao.get_threads()
         self.assertEqual(threads[0]['line'], 'differentline')
+    
+    def test_new_comment_pushes_thread_up(self):
+        now = datetime.datetime.now()
+        later = now + datetime.timedelta(days=5)
+        much_later = later + datetime.timedelta(days=5)
+        comment1 = self._comment(id=123, line='someline', created_at=now)
+        dao.save_to_thread(comment1)
+        comment2 = self._comment(id=124, line='differentline', created_at=later)
+        dao.save_to_thread(comment2)
+        comment3 = self._comment(id=125, line='someline', created_at=much_later)
+        dao.save_to_thread(comment3)
+        
+        threads = dao.get_threads()
+        self.assertEqual(threads[0]['line'], 'someline')
 
     def test_returns_thread_comments_ordered_by_created_ascending(self):
         now = datetime.datetime.now()
@@ -120,3 +164,4 @@ class TestDao(unittest.TestCase):
         threads = dao.get_threads()
         self.assertEqual(len(threads), 1)
         self.assertEqual([c['body'] for c in threads[0]['comments']], ['first!1', 'second'])
+    

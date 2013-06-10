@@ -19,11 +19,11 @@ class TestDao(unittest.TestCase):
         else:
             raise AssertionError("do you really want to drop database: %s?" % self.mongodb.name)
 
-    def _comment(self, id=123, commit='somecommitid', path='somepath', line='someline', created_at=None):
+    def _comment(self, id=123, commit='somecommitid', path='somepath', line='someline', body='body', created_at=None):
         if not created_at:
             created_at = datetime.datetime.today()
         created_at = created_at.replace(microsecond=0)
-        return {'id': 123, 'commit': commit, 'path': path, 'line': line, 'created_at': created_at}
+        return {'id': id, 'commit': commit, 'path': path, 'line': line, 'created_at': created_at, 'body': body}
 
     def test_puts_comments_in_same_commit_path_line_in_same_thread(self):
         comment1 = self._comment(id=123)
@@ -71,7 +71,7 @@ class TestDao(unittest.TestCase):
         
         comment2 = self._comment(created_at=(now-datetime.timedelta(days=5)))
         dao.save_to_thread(comment2)
-        
+
         thread = dao.get_threads()[0]
         self.assertEqual(thread['created_at'], comment2['created_at'])
     
@@ -108,3 +108,16 @@ class TestDao(unittest.TestCase):
         
         threads = dao.get_threads()
         self.assertEqual(threads[0]['line'], 'differentline')
+
+    def test_returns_thread_comments_ordered_by_created_ascending(self):
+        now = datetime.datetime.now()
+        later = now + datetime.timedelta(days=5)
+        comment1 = self._comment(id=123, body='second', created_at=later)
+        dao.save_to_thread(comment1)
+        comment2 = self._comment(id=124, body='first!1', created_at=now)
+        dao.save_to_thread(comment2)
+
+        threads = dao.get_threads()
+        self.assertEqual(len(threads), 1)
+        print threads[0]
+        self.assertEqual([c['body'] for c in threads[0]['comments']], ['first!1', 'second'])

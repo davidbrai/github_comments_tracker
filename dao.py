@@ -38,7 +38,7 @@ def get_threads():
     return res
 
 def get_comments(comment_ids):
-    comments = list(get_db().comments.find({'id': {'$in': comment_ids}}))
+    comments = list(get_db().comments.find({'id': {'$in': comment_ids}}).sort('created_at', 1))
     return remove_object_ids(comments)
 
 def remove_object_ids(comments):

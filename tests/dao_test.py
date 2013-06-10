@@ -119,5 +119,4 @@ class TestDao(unittest.TestCase):
 
         threads = dao.get_threads()
         self.assertEqual(len(threads), 1)
-        print threads[0]
         self.assertEqual([c['body'] for c in threads[0]['comments']], ['first!1', 'second'])

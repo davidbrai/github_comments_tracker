@@ -12,6 +12,8 @@ GITHUB = {
 DEBUG = True
 
 SECRET_KEY = 'development key'
+MONGO_DB = 'github_commenter'
+REPO_TO_FETCH = 'set your repo'
 ```
 
 Running tests:

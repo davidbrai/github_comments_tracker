@@ -14,6 +14,8 @@
       <thead>
         <tr>
           <th colspan="2">
+            <button ng-hide="thread.read" class="pull-right btn btn-info" ng-click="markAsRead(thread.id)">Cool</button>
+            <div ng-show="thread.read" class="pull-right">Cool</div>
             <a href="{{ thread.comments[0].url }}">{{ thread.path }} (line #{{ thread.line }})</a>
             Created: {{ thread.created_at | fromNow }}, Updated: {{ thread.updated_at | fromNow }}
           </th>

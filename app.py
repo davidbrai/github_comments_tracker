@@ -85,6 +85,11 @@ def my_threads():
 def all_threads():
     return jsonify(dao.get_all_threads())
 
+@app.route("/thread/<thread_id>/mark_as_read", methods=['POST'])
+def mark_thread_as_unread(thread_id):
+    dao.mark_thread_as_read(github.get('user').data['id'], thread_id)
+    return ''
+
 @app.route('/login')
 def login():
     return github.authorize(callback=url_for('authorized', _external=True))

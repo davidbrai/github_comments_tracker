@@ -22,7 +22,7 @@ def save_to_thread(comment):
              'line': comment['line'],
              'path': comment['path']}
     
-    get_db().threads.update(
+    res = get_db().threads.update(
             query,
             {
              '$push': {'comments': comment_id},
@@ -34,6 +34,7 @@ def save_to_thread(comment):
     
     update_thread_created_fields(query, comment['created_at'], comment['user_id'])
     update_thread_updated_date(query, comment['created_at'])
+    return res
 
 def update_thread_created_fields(query, created_at, created_by):
     update_query = query.copy()
@@ -46,17 +47,20 @@ def update_thread_updated_date(query, created_at):
     get_db().threads.update(update_query, {'$set': {'updated_at': created_at}})
 
 def get_user_threads(user_id):
-    return _get_threads({'created_by': user_id})
+    return _get_threads({'created_by': user_id}, user_id)
 
 def get_all_threads():
     return _get_threads({})
 
-def _get_threads(query):
+def _get_threads(query, user_id=None):
     threads = get_db().threads.find(query).sort([('updated_at', -1)])
     res = []
 
     for thread in threads:
+        read = user_id is not None and user_id in thread.get('read',[])
         res.append({
+            'id': str(thread['_id']),
+            'read': read,
             'path': thread['path'],
             'line': thread['line'],
             'commit': thread['commit'],
@@ -77,3 +81,8 @@ def remove_object_ids(comments):
         del c['_id']
         res.append(c)
     return res
+
+def mark_thread_as_read(user_id, thread_id):
+    get_db().threads.update(
+            {'_id': pymongo.helpers.bson.ObjectId(thread_id)},
+            {'$addToSet': {'read': user_id}})

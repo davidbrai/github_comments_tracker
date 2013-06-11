@@ -186,3 +186,25 @@ class TestDao(unittest.TestCase):
 
         self.assertEqual(len(dao.get_user_threads(1)), 0)
         self.assertEqual(len(dao.get_user_threads(2)), 1)
+
+    def test_get_user_threads_returns_read_when_thread_was_read_by_user(self):
+        comment1 = self._comment(user_id=1)
+        object_id = dao.save_to_thread(comment1)['upserted']
+        dao.mark_thread_as_read(1, str(object_id))
+
+        thread = dao.get_user_threads(1)[0]
+        self.assertTrue(thread['read'])
+
+    def test_get_user_threads_returns_not_read_when_thread_was_not_read_by_user(self):
+        dao.save_to_thread(self._comment(user_id=1))
+
+        thread = dao.get_user_threads(1)[0]
+        self.assertFalse(thread['read'])
+
+    def test_get_user_threads_returns_not_read_when_thread_was_read_by_other_user(self):
+        comment1 = self._comment(user_id=1)
+        object_id = dao.save_to_thread(comment1)['upserted']
+        dao.mark_thread_as_read(2, str(object_id))
+
+        thread = dao.get_user_threads(1)[0]
+        self.assertFalse(thread['read'])

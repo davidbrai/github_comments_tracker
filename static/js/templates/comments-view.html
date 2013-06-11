@@ -24,7 +24,7 @@
         <tbody>
           <tr ng-repeat="comment in thread.comments">
             <td class="avatar">
-              <img width=40 height=40 src="{{ comment.avatar_url }}" title="{{ comment.user_login }}">
+              <img width=40 height=40 ng-src="{{ comment.avatar_url }}" title="{{ comment.user_login }}">
             </td>
             <td>
               <div class="pull-right">{{ comment.created_at | fromNow }}</div>

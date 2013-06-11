@@ -41,7 +41,8 @@ def fetch_comments_from_github(repo, max_comments=None):
             'commit': c.commit_id,
             'line': c.line,
             'path': c.path,
-            'created_at': c.created_at
+            'created_at': c.created_at,
+            'avatar_url': c.user.avatar_url
         }
         dao.save_to_thread(comment)
 

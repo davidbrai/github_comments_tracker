@@ -1,8 +1,18 @@
 import pymongo
 import settings
+from time import time
+
+_mongo_client = None
 
 def get_db():
-    return pymongo.MongoClient()[settings.MONGO_DB]
+    global _mongo_client
+    if _mongo_client is None:
+        _mongo_client = pymongo.MongoClient()[settings.MONGO_DB]
+        ensure_indexes(_mongo_client)
+    return _mongo_client
+
+def ensure_indexes(mongo_client):
+    mongo_client.threads.ensure_index([('created_by', 1)])
 
 def save_to_thread(comment):
     comment_id = comment['id']
@@ -44,6 +54,7 @@ def get_all_threads():
 def _get_threads(query):
     threads = get_db().threads.find(query).sort([('updated_at', -1)])
     res = []
+
     for thread in threads:
         res.append({
             'path': thread['path'],

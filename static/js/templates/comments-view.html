@@ -1,19 +1,33 @@
 <p>
-    Got {{ threads.length }} threads.<br>
-    <a href="/fetch_comments/100">fetch 100 comments from github</a><br>
-    <a href="/fetch_comments">fetch all comments from github (slow)</a><br>
-    <div ng-switch on="mode" >
-        <a ng-switch-when="all" href="#">My threads</a>
-        <a ng-switch-when="mine" href="#/all">All threads</a>
-    </div>
+  Got {{ threads.length }} threads.<br>
+  <a href="/fetch_comments/100">fetch 100 comments from github</a><br>
+  <a href="/fetch_comments">fetch all comments from github (slow)</a><br>
+  <div ng-switch on="mode">
+    <a ng-switch-when="all" href="#">My threads</a>
+    <a ng-switch-when="mine" href="#/all">All threads</a>
+  </div>
 </p>
 
-<div ng-repeat="thread in threads">
-    <div>
-        <a href="{{ thread.comments[0].url }}">{{ thread.path }} (line #{{ thread.line }})</a>
-        Created: {{ thread.created_at | fromNow }}, Updated: {{ thread.updated_at | fromNow }}
+<div ng-repeat="thread in threads" class="thread">
+  <div class="well">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th colspan="2">
+            <a href="{{ thread.comments[0].url }}">{{ thread.path }} (line #{{ thread.line }})</a>
+            Created: {{ thread.created_at | fromNow }}, Updated: {{ thread.updated_at | fromNow }}
+          </th>
+        </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="comment in thread.comments">
+            <td class="avatar">{{ comment.user_login }}</td>
+            <td>
+              <div class="pull-right">{{ comment.created_at | fromNow }}</div>
+              <div>{{ comment.body }}</div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-    <ul ng-repeat="comment in thread.comments">
-        <li><b>{{ comment.user_login }}</b>: {{ comment.body }} <i>{{ comment.created_at | fromNow }}</i></li>
-    </ul>
 </div>

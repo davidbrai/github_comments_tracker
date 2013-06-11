@@ -1,0 +1,13 @@
+.thread .well {
+    padding: 0;
+    background: none;
+}
+.thread .table {
+    margin-bottom: 0;
+}
+.thread .table thead {
+    background: #f3f3f3;
+}
+.thread .table td.avatar {
+    width: 80px;
+}

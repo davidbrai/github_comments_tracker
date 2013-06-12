@@ -79,7 +79,7 @@ def comments():
 
 @app.route("/threads")
 def my_threads():
-    return jsonify(dao.get_user_threads(github.get('user').data['id']))
+    return jsonify(dao.get_user_threads(session['github_user_id']))
 
 @app.route("/threads/all")
 def all_threads():
@@ -87,7 +87,7 @@ def all_threads():
 
 @app.route("/thread/<thread_id>/mark_as_read", methods=['POST'])
 def mark_thread_as_read(thread_id):
-    dao.mark_thread_as_read(github.get('user').data['id'], thread_id)
+    dao.mark_thread_as_read(session['github_user_id'], thread_id)
     return ''
 
 @app.route('/login')
@@ -110,6 +110,7 @@ def authorized(resp):
             request.args['error_description']
         )
     session['github_token'] = (resp['access_token'], '')
+    session['github_user_id'] = github.get('user').data['id']
     return redirect(url_for('comments'))
 
 @github.tokengetter

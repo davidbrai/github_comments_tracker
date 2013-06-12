@@ -1,21 +1,25 @@
 <p>
-  Got {{ threads.length }} threads.<br>
   <a href="/fetch_comments/100">fetch 100 comments from github</a><br>
   <a href="/fetch_comments">fetch all comments from github (slow)</a><br>
   <div ng-switch on="mode">
-    <a ng-switch-when="all" href="#">My threads</a>
-    <a ng-switch-when="mine" href="#/all">All threads</a>
+    <div ng-switch-when="all">
+        Displaying {{ threads.length }} threads.<br>
+        <a href="#">My threads</a>
+    </div>
+    <div ng-switch-when="mine">
+        Displaying {{ (threads | filter:unreadFilter).length }} unread threads out of {{ threads.length }} threads.<br>
+        <a href="#/all">All threads</a>
+    </div>
   </div>
 </p>
 
-<div ng-repeat="thread in threads" class="thread">
+<div ng-repeat="thread in threads | filter:unreadFilter" ng-animate="{ leave: 'fade-out' }" class="thread">
   <div class="well">
     <table class="table table-striped">
       <thead>
         <tr>
           <th colspan="2">
-            <button ng-hide="thread.read" class="pull-right btn btn-info" ng-click="markAsRead(thread.id)">Cool</button>
-            <div ng-show="thread.read" class="pull-right">Cool</div>
+            <button ng-hide="!markAsRead" class="pull-right btn btn-info" ng-click="markAsRead(thread)">Cool</button>
             <a href="{{ thread.comments[0].url }}">{{ thread.path }} (line #{{ thread.line }})</a>
             Created: {{ thread.created_at | fromNow }}, Updated: {{ thread.updated_at | fromNow }}
           </th>

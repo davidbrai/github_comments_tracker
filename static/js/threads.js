@@ -4,8 +4,10 @@ angular.module('threads', ['ngResource']).
     return {
         all: $resource('/threads/all'),
         mine: $resource('/threads'),
-        markAsRead: function(threadId) {
-            $http.post('/thread/' + threadId + '/mark_as_read');
+        markAsRead: function(thread) {
+            $http.post('/thread/' + thread.id + '/mark_as_read').success(function() {
+                thread.read = true;
+            });
         }
     };
 });

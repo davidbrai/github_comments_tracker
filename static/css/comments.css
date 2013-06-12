@@ -1,3 +1,13 @@
+.thread.fade-out {
+    -webkit-transition: 400ms linear all; /* Safari/Chrome */
+    -moz-transition: 400ms linear all; /* Firefox */
+    -ms-transition: 400ms linear all; /* IE10 */
+    -o-transition: 400ms linear all; /* Opera */
+    transition: 400ms linear all; /* Future Browsers */
+}
+.thread.fade-out-active {
+    opacity: 0;
+}
 .thread .well {
     padding: 0;
     background: none;

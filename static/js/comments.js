@@ -19,11 +19,11 @@ angular.module('comments').
 function AllThreadsCtrl($scope, Threads) {
     $scope.mode = 'all';
     $scope.threads = Threads.all.query();
-    $scope.markAsRead = Threads.markAsRead;
 }
 
 function MyThreadsCtrl($scope, Threads) {
     $scope.mode = 'mine';
     $scope.threads = Threads.mine.query();
+    $scope.unreadFilter = {read: 'false'};
     $scope.markAsRead = Threads.markAsRead;
 }

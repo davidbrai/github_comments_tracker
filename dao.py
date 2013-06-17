@@ -90,3 +90,7 @@ def mark_thread_as_read(user_id, thread_id):
 
 def save_repo(repo):
     get_db().repos.update({'id': repo['id']}, repo, upsert=True)
+
+
+def get_all_repos():
+    return list(get_db().repos.find())

@@ -1,11 +1,11 @@
 
-var app = angular.module('comments', ['threads']).config(function($routeProvider) {
-    $routeProvider.when('/', {
+var app = angular.module('comments', ['threads', 'repos']).config(function($routeProvider) {
+    $routeProvider.when('/mine/:repoid', {
         controller:MyThreadsCtrl, templateUrl:'/static/js/templates/comments-view.html'
-    }).when('/all', {
+    }).when('/all/:repoid', {
         controller:AllThreadsCtrl, templateUrl:'/static/js/templates/comments-view.html'
     }).otherwise({
-        redirectTo:'/'
+        redirectTo:'/mine/'
     });
 });
 
@@ -16,14 +16,16 @@ angular.module('comments').
         };
     });
 
-function AllThreadsCtrl($scope, Threads) {
+function AllThreadsCtrl($scope, Threads, Repos) {
     $scope.mode = 'all';
     $scope.threads = Threads.all.query();
+    $scope.repos = Repos.all.query();
 }
 
-function MyThreadsCtrl($scope, Threads) {
+function MyThreadsCtrl($scope, Threads, Repos) {
     $scope.mode = 'mine';
     $scope.threads = Threads.mine.query();
     $scope.unreadFilter = {read: 'false'};
     $scope.markAsRead = Threads.markAsRead;
+    $scope.repos = Repos.all.query();
 }

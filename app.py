@@ -86,6 +86,10 @@ def comments():
 def my_threads():
     return jsonify(dao.get_user_threads(session['github_user_id']))
 
+@app.route("/repos")
+def my_repos():
+    return jsonify(dao.get_all_repos())
+
 @app.route("/threads/all")
 def all_threads():
     return jsonify(dao.get_all_threads())

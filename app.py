@@ -42,7 +42,8 @@ def fetch_comments_from_github(repo, max_comments=None):
             'line': c.line,
             'path': c.path,
             'created_at': c.created_at,
-            'avatar_url': c.user.avatar_url
+            'avatar_url': c.user.avatar_url,
+            'repo': repo.id
         }
         dao.save_to_thread(comment)
 
@@ -58,8 +59,12 @@ def login_to_github_and_get_all_comments(max_comments):
 
     log.info("getting comments from github")
     github_client = Github(session['github_token'][0])
-    repo = github_client.get_repo(app.config['REPO_TO_FETCH'])
-    fetch_comments_from_github(repo, max_comments)
+    for repo_name in app.config['REPOS']:
+        log.info("saving repo " + repo_name)
+        repo = github_client.get_repo(repo_name)
+        dao.save_repo({'id': repo.id,
+                       'repo_name': repo.name})
+        fetch_comments_from_github(repo, max_comments)
     return redirect(url_for('comments'))
 
 @app.route("/fetch_comments")

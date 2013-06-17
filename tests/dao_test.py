@@ -208,3 +208,12 @@ class TestDao(unittest.TestCase):
 
         thread = dao.get_user_threads(1)[0]
         self.assertFalse(thread['read'])
+
+    def test_save_repo(self):
+        repo = {'id': 123, 'repo_name': 'repo'}
+
+        dao.save_repo(repo)
+
+        saved_repo = dao.get_db().repos.find({})[0]
+        self.assertEqual(saved_repo['id'], repo['id'])
+

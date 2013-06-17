@@ -16,7 +16,7 @@ def ensure_indexes(mongo_client):
 
 def save_to_thread(comment):
     comment_id = comment['id']
-    get_db().comments.update({'id': comment_id}, comment, upsert=True)
+    get_db().comments.update({'id': comment_id, 'repo': comment['repo']}, comment, upsert=True)
     
     query = {'commit': comment['commit'],
              'line': comment['line'],
@@ -57,7 +57,7 @@ def _get_threads(query, user_id=None):
     res = []
 
     for thread in threads:
-        read = user_id is not None and user_id in thread.get('read',[])
+        read = user_id is not None and user_id in thread.get('read', [])
         res.append({
             'id': str(thread['_id']),
             'read': read,
@@ -86,3 +86,7 @@ def mark_thread_as_read(user_id, thread_id):
     get_db().threads.update(
             {'_id': pymongo.helpers.bson.ObjectId(thread_id)},
             {'$addToSet': {'read': user_id}})
+
+
+def save_repo(repo):
+    get_db().repos.update({'id': repo['id']}, repo, upsert=True)

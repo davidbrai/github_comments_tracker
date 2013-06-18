@@ -97,7 +97,6 @@ def login():
 @app.route('/logout')
 def logout():
     session.pop('github_token', None)
-    ###### should github_user_id also be here???
     return redirect(url_for('comments'))
 
 @app.route('/login/authorized')

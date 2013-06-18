@@ -57,7 +57,7 @@ def login_to_github_and_get_all_comments(max_comments):
         return redirect(url_for('login'))
 
     log.info("getting comments from github")
-    github_client = Github(session['github_token'][0])
+    github_client = Github(session['github_token'][0], per_page=100)
     repo = github_client.get_repo(app.config['REPO_TO_FETCH'])
     fetch_comments_from_github(repo, max_comments)
     return redirect(url_for('comments'))
@@ -97,6 +97,7 @@ def login():
 @app.route('/logout')
 def logout():
     session.pop('github_token', None)
+    ###### should github_user_id also be here???
     return redirect(url_for('comments'))
 
 @app.route('/login/authorized')

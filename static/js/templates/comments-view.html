@@ -14,11 +14,11 @@
 </p>
 
 <ul class="nav nav-tabs">
-    <li class="active">
-        <a href="#">All Repositories</a>
+    <li ng-class="{active:!active_repo_id}">
+        <a href="#/{{ mode }}">All Repositories</a>
     </li>
-    <li ng-repeat="repo in repos">
-        <a href="#">
+    <li ng-repeat="repo in repos" ng-class="{active:active_repo_id==repo.id}">
+        <a href="#/{{ mode }}/{{ repo.id }}">
         {{  repo.repo_name }}
         </a>
     </li>

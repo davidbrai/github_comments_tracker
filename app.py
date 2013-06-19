@@ -96,6 +96,7 @@ def login():
 
 @app.route('/logout')
 def logout():
+    session.pop('github_user_id', None)
     session.pop('github_token', None)
     return redirect(url_for('comments'))
 

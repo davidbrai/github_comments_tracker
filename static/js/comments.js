@@ -15,10 +15,30 @@ angular.module('comments').filter('fromNow', function() {
     };
 });
 
+marked.setOptions({
+    gfm: true,
+    tables: true,
+    breaks: false,
+    pedantic: false,
+    sanitize: true,
+    smartLists: true,
+    smartypants: false,
+    langPrefix: 'language-',
+    highlight:function (code, lang) {
+        if (lang == 'js') {
+            lang = 'javascript';
+        }
+        if (lang != undefined && lang in hljs.LANGUAGES) {
+            return hljs.highlight(lang, code).value;
+        }
+
+        return hljs.highlightAuto(code).value;
+    }
+});
+
 angular.module('comments').filter('markdown', function() {
-    var converter = new Showdown.converter();
     return function(markdownString) {
-        return converter.makeHtml(markdownString);
+        return marked(markdownString);
     }
 });
 

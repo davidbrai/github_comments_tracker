@@ -1,6 +1,8 @@
 github comments tracker
 =======================
 
+[![Build Status](https://travis-ci.org/davidbrai/github_comments_tracker.png?branch=master)](https://travis-ci.org/davidbrai/github_comments_tracker)
+
 assumes a settings.py file with the following content:
 
 ```

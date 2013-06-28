@@ -1,12 +1,12 @@
 import unittest
-import settings
+import config
 import dao
 import datetime
 
 class TestDao(unittest.TestCase):
 
     def setUp(self):
-        settings.MONGO_DB = 'test_github_comments'
+        config.MONGO_DB = 'test_github_comments'
         self.mongodb = dao.get_db()
         if 'test' not in self.mongodb.name:
             raise AssertionError("test database doesn't contain 'test'. it is: %s" % self.mongodb.name)

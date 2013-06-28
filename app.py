@@ -12,7 +12,7 @@ from github import Github
 log = logging.getLogger(__name__)
 
 app = Flask(__name__)
-app.config.from_object('settings')
+app.config.from_object('config')
 
 oauth = OAuth(app)
 github_app_settings = app.config['GITHUB']

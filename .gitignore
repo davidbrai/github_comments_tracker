@@ -4,3 +4,4 @@ settings.py
 *.iml
 .project
 .pydevproject
+local_config.py

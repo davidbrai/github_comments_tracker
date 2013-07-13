@@ -90,9 +90,13 @@ def my_threads():
 def my_repos():
     return jsonify(dao.get_all_repos())
 
-@app.route("/threads/all")
-def all_threads():
-    return jsonify(dao.get_all_threads())
+@app.route("/threads/<mode>", defaults={'repo_id': None})
+@app.route("/threads/<mode>/<repo_id>")
+def all_threads(mode, repo_id):
+    if (mode == 'all'):
+        return jsonify(dao.get_all_threads_for_repo(repo_id))
+    else:
+        return jsonify(dao.get_user_threads_for_repo(session['github_user_id'], repo_id))
 
 @app.route("/thread/<thread_id>/mark_as_read", methods=['POST'])
 def mark_thread_as_read(thread_id):

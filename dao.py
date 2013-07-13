@@ -20,7 +20,8 @@ def save_to_thread(comment):
     
     query = {'commit': comment['commit'],
              'line': comment['line'],
-             'path': comment['path']}
+             'path': comment['path'],
+             'repo': comment['repo']}
     
     res = get_db().threads.update(
             query,
@@ -46,11 +47,23 @@ def update_thread_updated_date(query, created_at):
     update_query['updated_at'] = {'$lt': created_at}
     get_db().threads.update(update_query, {'$set': {'updated_at': created_at}})
 
+def get_user_threads_for_repo(user_id, repo_id):
+    if repo_id:
+        return _get_threads({'created_by': user_id, 'repo': int(repo_id)}, user_id)
+    else:
+        return _get_threads({'created_by': user_id}, user_id)
+
 def get_user_threads(user_id):
-    return _get_threads({'created_by': user_id}, user_id)
+    return get_user_threads_for_repo(user_id, None)
 
 def get_all_threads():
-    return _get_threads({})
+    return get_all_threads_for_repo(None)
+
+def get_all_threads_for_repo(repo_id):
+    if repo_id:
+        return _get_threads({'repo': int(repo_id)})
+    else:
+        return _get_threads({})
 
 def _get_threads(query, user_id=None):
     threads = get_db().threads.find(query).sort([('updated_at', -1)])

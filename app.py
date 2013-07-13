@@ -93,7 +93,7 @@ def my_repos():
 @app.route("/threads/<mode>", defaults={'repo_id': None})
 @app.route("/threads/<mode>/<repo_id>")
 def all_threads(mode, repo_id):
-    if (mode == 'all'):
+    if mode == 'all':
         return jsonify(dao.get_all_threads_for_repo(repo_id))
     else:
         return jsonify(dao.get_user_threads_for_repo(session['github_user_id'], repo_id))

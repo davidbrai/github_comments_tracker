@@ -1,5 +1,5 @@
 import pymongo
-import settings
+import config
 from time import time
 
 _mongo_client = None
@@ -7,7 +7,7 @@ _mongo_client = None
 def get_db():
     global _mongo_client
     if _mongo_client is None:
-        _mongo_client = pymongo.MongoClient()[settings.MONGO_DB]
+        _mongo_client = pymongo.MongoClient()[config.MONGO_DB]
         ensure_indexes(_mongo_client)
     return _mongo_client
 

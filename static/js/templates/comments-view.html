@@ -43,7 +43,7 @@
             </td>
             <td>
               <div class="pull-right">{{ comment.created_at | fromNow }}</div>
-              <div>{{ comment.body }}</div>
+              <div ng-bind-html-unsafe="comment.body | escapeHtml | markdown "></div>
             </td>
           </tr>
         </tbody>

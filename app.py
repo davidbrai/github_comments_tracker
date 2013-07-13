@@ -12,7 +12,7 @@ from github import Github
 log = logging.getLogger(__name__)
 
 app = Flask(__name__)
-app.config.from_object('settings')
+app.config.from_object('config')
 
 oauth = OAuth(app)
 github_app_settings = app.config['GITHUB']
@@ -58,7 +58,7 @@ def login_to_github_and_get_all_comments(max_comments):
         return redirect(url_for('login'))
 
     log.info("getting comments from github")
-    github_client = Github(session['github_token'][0])
+    github_client = Github(session['github_token'][0], per_page=100)
     for repo_name in app.config['REPOS']:
         log.info("saving repo " + repo_name)
         repo = github_client.get_repo(repo_name)
@@ -105,6 +105,7 @@ def login():
 
 @app.route('/logout')
 def logout():
+    session.pop('github_user_id', None)
     session.pop('github_token', None)
     return redirect(url_for('comments'))
 

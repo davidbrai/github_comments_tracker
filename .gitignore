@@ -5,3 +5,4 @@ settings.py
 .project
 .pydevproject
 local_config.py
+.venv

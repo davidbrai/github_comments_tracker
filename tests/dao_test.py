@@ -19,11 +19,11 @@ class TestDao(unittest.TestCase):
         else:
             raise AssertionError("do you really want to drop database: %s?" % self.mongodb.name)
 
-    def _comment(self, id=123, commit='somecommitid', path='somepath', line='someline', body='body', user_id=17, created_at=None):
+    def _comment(self, id=123, commit='somecommitid', path='somepath', line='someline', body='body', user_id=17, created_at=None, repo=1):
         if not created_at:
             created_at = datetime.datetime.today()
         created_at = created_at.replace(microsecond=0)
-        return {'id': id, 'commit': commit, 'path': path, 'line': line, 'created_at': created_at, 'body': body, 'user_id': user_id}
+        return {'id': id, 'commit': commit, 'path': path, 'line': line, 'created_at': created_at, 'body': body, 'user_id': user_id, 'repo':repo}
 
     def test_puts_comments_in_same_commit_path_line_in_same_thread(self):
         comment1 = self._comment(id=123)
@@ -208,3 +208,23 @@ class TestDao(unittest.TestCase):
 
         thread = dao.get_user_threads(1)[0]
         self.assertFalse(thread['read'])
+
+    def test_threads_for_specific_repo(self):
+        comment1 = self._comment(id=1, user_id=1, repo=1)
+        comment2 = self._comment(id=2, user_id=1, repo=2)
+
+        dao.save_to_thread(comment1)
+        dao.save_to_thread(comment2)
+
+        threads = dao.get_user_threads_for_repo(1, 1)
+        self.assertEqual(len(threads), 1)
+        self.assertIn(comment1, threads[0]['comments'])
+
+    def test_save_repo(self):
+        repo = {'id': 123, 'repo_name': 'repo'}
+
+        dao.save_repo(repo)
+
+        saved_repo = dao.get_db().repos.find({})[0]
+        self.assertEqual(saved_repo['id'], repo['id'])
+

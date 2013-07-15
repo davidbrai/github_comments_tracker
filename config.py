@@ -15,7 +15,7 @@ SECRET_KEY = 'development key'
 MONGO_DB = 'github_comments'
 
 # enter the relative path to your repo. example: github.com/davidbrai/github_comment_tracker -> davidbrai/github_comment_tracker
-REPO_TO_FETCH = 'set your repo'
+REPOS = ['repo1', 'repo2']
 
 try:
     from local_config import *

@@ -42,7 +42,8 @@ def fetch_comments_from_github(repo, max_comments=None):
             'line': c.line,
             'path': c.path,
             'created_at': c.created_at,
-            'avatar_url': c.user.avatar_url
+            'avatar_url': c.user.avatar_url,
+            'repo': repo.id
         }
         dao.save_to_thread(comment)
 
@@ -58,8 +59,12 @@ def login_to_github_and_get_all_comments(max_comments):
 
     log.info("getting comments from github")
     github_client = Github(session['github_token'][0], per_page=100)
-    repo = github_client.get_repo(app.config['REPO_TO_FETCH'])
-    fetch_comments_from_github(repo, max_comments)
+    for repo_name in app.config['REPOS']:
+        log.info("saving repo " + repo_name)
+        repo = github_client.get_repo(repo_name)
+        dao.save_repo({'id': repo.id,
+                       'repo_name': repo.name})
+        fetch_comments_from_github(repo, max_comments)
     return redirect(url_for('comments'))
 
 @app.route("/fetch_comments")
@@ -81,9 +86,17 @@ def comments():
 def my_threads():
     return jsonify(dao.get_user_threads(session['github_user_id']))
 
-@app.route("/threads/all")
-def all_threads():
-    return jsonify(dao.get_all_threads())
+@app.route("/repos")
+def my_repos():
+    return jsonify(dao.get_all_repos())
+
+@app.route("/threads/<mode>", defaults={'repo_id': None})
+@app.route("/threads/<mode>/<repo_id>")
+def all_threads(mode, repo_id):
+    if mode == 'all':
+        return jsonify(dao.get_all_threads_for_repo(repo_id))
+    else:
+        return jsonify(dao.get_user_threads_for_repo(session['github_user_id'], repo_id))
 
 @app.route("/thread/<thread_id>/mark_as_read", methods=['POST'])
 def mark_thread_as_read(thread_id):

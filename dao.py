@@ -16,11 +16,12 @@ def ensure_indexes(mongo_client):
 
 def save_to_thread(comment):
     comment_id = comment['id']
-    get_db().comments.update({'id': comment_id}, comment, upsert=True)
+    get_db().comments.update({'id': comment_id, 'repo': comment['repo']}, comment, upsert=True)
     
     query = {'commit': comment['commit'],
              'line': comment['line'],
-             'path': comment['path']}
+             'path': comment['path'],
+             'repo': comment['repo']}
     
     res = get_db().threads.update(
             query,
@@ -46,18 +47,30 @@ def update_thread_updated_date(query, created_at):
     update_query['updated_at'] = {'$lt': created_at}
     get_db().threads.update(update_query, {'$set': {'updated_at': created_at}})
 
+def get_user_threads_for_repo(user_id, repo_id):
+    if repo_id:
+        return _get_threads({'created_by': user_id, 'repo': int(repo_id)}, user_id)
+    else:
+        return _get_threads({'created_by': user_id}, user_id)
+
 def get_user_threads(user_id):
-    return _get_threads({'created_by': user_id}, user_id)
+    return get_user_threads_for_repo(user_id, None)
 
 def get_all_threads():
-    return _get_threads({})
+    return get_all_threads_for_repo(None)
+
+def get_all_threads_for_repo(repo_id):
+    if repo_id:
+        return _get_threads({'repo': int(repo_id)})
+    else:
+        return _get_threads({})
 
 def _get_threads(query, user_id=None):
     threads = get_db().threads.find(query).sort([('updated_at', -1)])
     res = []
 
     for thread in threads:
-        read = user_id is not None and user_id in thread.get('read',[])
+        read = user_id is not None and user_id in thread.get('read', [])
         res.append({
             'id': str(thread['_id']),
             'read': read,
@@ -86,3 +99,9 @@ def mark_thread_as_read(user_id, thread_id):
     get_db().threads.update(
             {'_id': pymongo.helpers.bson.ObjectId(thread_id)},
             {'$addToSet': {'read': user_id}})
+
+def save_repo(repo):
+    get_db().repos.update({'id': repo['id']}, repo, upsert=True)
+
+def get_all_repos():
+    return list(get_db().repos.find())

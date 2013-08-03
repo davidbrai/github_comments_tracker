@@ -86,3 +86,8 @@ def mark_thread_as_read(user_id, thread_id):
     get_db().threads.update(
             {'_id': pymongo.helpers.bson.ObjectId(thread_id)},
             {'$addToSet': {'read': user_id}})
+
+def comment_exists(comment_id):
+    return get_db().comments.find_one({'id': comment_id}) is not None
+
+

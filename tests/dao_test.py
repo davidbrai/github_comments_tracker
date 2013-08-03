@@ -208,3 +208,10 @@ class TestDao(unittest.TestCase):
 
         thread = dao.get_user_threads(1)[0]
         self.assertFalse(thread['read'])
+
+    def test_comment_exists(self):
+        comment = self._comment()
+        self.assertFalse(dao.comment_exists(comment['id']))
+
+        dao.save_to_thread(comment)
+        self.assertTrue(dao.comment_exists(comment['id']))

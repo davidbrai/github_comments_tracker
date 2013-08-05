@@ -25,7 +25,7 @@ def save_to_thread(comment):
     res = get_db().threads.update(
             query,
             {
-             '$push': {'comments': comment_id},
+             '$addToSet': {'comments': comment_id},
              '$setOnInsert': {'created_at': comment['created_at'],
                               'created_by': comment['user_id'],
                               'updated_at': comment['created_at']}
@@ -53,8 +53,11 @@ def get_all_threads():
     return _get_threads({})
 
 def _get_threads(query, user_id=None):
-    threads = get_db().threads.find(query).sort([('updated_at', -1)])
+    threads = list(get_db().threads.find(query).sort([('updated_at', -1)]))
     res = []
+
+    comment_ids = sum((thread['comments'] for thread in threads), [])
+    comment_by_id = dict((c['id'], c) for c in get_comments(comment_ids))
 
     for thread in threads:
         read = user_id is not None and user_id in thread.get('read',[])
@@ -66,7 +69,8 @@ def _get_threads(query, user_id=None):
             'commit': thread['commit'],
             'created_at': thread['created_at'],
             'updated_at': thread['updated_at'],
-            'comments': get_comments(thread['comments'])
+            'comments': sorted((comment_by_id[cid] for cid in thread['comments']),
+                               key=lambda c: c['created_at'])
         })
     return res
 

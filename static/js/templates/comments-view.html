@@ -8,35 +8,37 @@
         <a href="#">My threads</a>
     </div>
     <div ng-switch-when="mine">
-        Displaying {{ (threads | filter:unreadFilter).length }} unread threads out of {{ threads.length }} threads.<br>
+        Displaying {{ (threads | filter:unreadFilter).length }} unread threads out of {{ threads.length }} threads. (scroll for more)<br>
         <a href="#/all">All threads</a>
     </div>
   </div>
 </p>
 
-<div ng-repeat="thread in threads | filter:unreadFilter" ng-animate="{ leave: 'fade-out' }" class="thread">
-  <div class="well">
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th colspan="2">
-            <button ng-hide="!markAsRead" class="pull-right btn btn-info" ng-click="markAsRead(thread)">Cool</button>
-            <a href="{{ thread.comments[0].url }}">{{ thread.path }} (line #{{ thread.line }})</a>
-            Created: {{ thread.created_at | fromNow }}, Updated: {{ thread.updated_at | fromNow }}
-          </th>
-        </tr>
-        </thead>
-        <tbody>
-          <tr ng-repeat="comment in thread.comments">
-            <td class="avatar">
-              <img width=40 height=40 ng-src="{{ comment.avatar_url }}" title="{{ comment.user_login }}">
-            </td>
-            <td>
-              <div class="pull-right">{{ comment.created_at | fromNow }}</div>
-              <div ng-bind-html-unsafe="comment.body | escapeHtml | markdown "></div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+<div infinite-scroll='loadMore()' infinite-scroll-distance='2'>
+    <div ng-repeat="thread in threads | filter:unreadFilter" ng-animate="{ leave: 'fade-out' }" class="thread">
+      <div class="well">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th colspan="2">
+                <button ng-hide="!markAsRead" class="pull-right btn btn-info" ng-click="markAsRead(thread)">Cool</button>
+                <a href="{{ thread.comments[0].url }}">{{ thread.path }} (line #{{ thread.line }})</a>
+                Created: {{ thread.created_at | fromNow }}, Updated: {{ thread.updated_at | fromNow }}
+              </th>
+            </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="comment in thread.comments">
+                <td class="avatar">
+                  <img width=40 height=40 ng-src="{{ comment.avatar_url }}" title="{{ comment.user_login }}">
+                </td>
+                <td>
+                  <div class="pull-right">{{ comment.created_at | fromNow }}</div>
+                  <div ng-bind-html-unsafe="comment.body | escapeHtml | markdown "></div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
     </div>
 </div>

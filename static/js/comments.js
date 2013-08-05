@@ -1,5 +1,5 @@
 
-var app = angular.module('comments', ['threads']).config(function($routeProvider) {
+var app = angular.module('comments', ['threads', 'infinite-scroll']).config(function($routeProvider) {
     $routeProvider.when('/', {
         controller:MyThreadsCtrl, templateUrl:'/static/js/templates/comments-view.html'
     }).when('/all', {
@@ -56,12 +56,26 @@ angular.module('comments').filter('escapeHtml', function() {
 
 function AllThreadsCtrl($scope, Threads) {
     $scope.mode = 'all';
-    $scope.threads = Threads.all.query();
+    fetchThreadsWithInfiniteScrolling(Threads.all, $scope);
 }
 
 function MyThreadsCtrl($scope, Threads) {
     $scope.mode = 'mine';
-    $scope.threads = Threads.mine.query();
     $scope.unreadFilter = {read: 'false'};
     $scope.markAsRead = Threads.markAsRead;
+    fetchThreadsWithInfiniteScrolling(Threads.mine, $scope);
+}
+
+function fetchThreadsWithInfiniteScrolling(resource, $scope) {
+    $scope.threads = [];
+    var threads = resource.query(function() {
+        $scope.threads = threads.slice(0,8);
+    });
+
+    $scope.loadMore = function() {
+        var last = $scope.threads.length;
+        for(var i = 1; i <= Math.min(8, threads.length-last); i++) {
+            $scope.threads.push(threads[last + i]);
+        }
+    };
 }
